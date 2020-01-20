@@ -13,6 +13,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
+    var deleteList = [Task]()
     var tasks : [Task]?
 
     override func viewDidLoad() {
@@ -94,6 +95,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            deleteList.append(tasks![indexPath.row])
             tasks?.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }

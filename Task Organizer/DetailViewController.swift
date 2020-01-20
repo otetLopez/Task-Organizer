@@ -58,9 +58,20 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        let appleDelegate = UIApplication.shared.delegate as! AppDelegate
+             
+        // We need the context.  This context is the manager like location manager, audio manager
+        let context = appleDelegate.persistentContainer.viewContext
+        
+        for idx in delegate?.deleteList ?? [Task]() {
+            deleteData(context: context, format: idx.getTitle())
+        }
+        delegate?.deleteList = [Task]()
+        
         configureView()
         loadCoreData()
         NotificationCenter.default.addObserver(self, selector: #selector(saveCoreData), name: UIApplication.willResignActiveNotification, object: nil)
+        
     }
 
     var detailItem: Task? {
@@ -99,13 +110,6 @@ class DetailViewController: UIViewController {
             textField.resignFirstResponder()
         }
     }
-        
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if let TaskTable = (segue.destination as! UINavigationController).topViewController as! MasterViewController? {
-//            print("Segue assignment \(self.tasksList!.count)")
-//            TaskTable.tasks = self.tasksList ?? [Task]()
-//        }
-//    }
         
         // Accessing Core Data
         
@@ -174,6 +178,30 @@ class DetailViewController: UIViewController {
                 }
             } catch{ print(error)  }
         }
+
+    func deleteData(context: NSManagedObjectContext, format : String) {
+        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task_Organizer")
+                // Helps filter the query
+            deleteRequest.predicate = NSPredicate(format: "title=%@", format)
+            deleteRequest.returnsObjectsAsFaults = false
+            do {
+                let results = try context.fetch(deleteRequest)
+                if results.count > 0 {
+                    for idx in results as! [NSManagedObject] {
+                        // Delete the user or entity
+                        if let name = idx.value(forKey: "title") as? String {
+                            print("DEBUG: Deleting eith name \(format)")
+                            context.delete(idx)
+                            do {
+                                try context.save()
+                            } catch { print(error) }
+                            print(name)
+                        }
+                    }
+                }
+            } catch { print(error) }
+    }
+    
     
 
 }
