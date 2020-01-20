@@ -14,6 +14,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
     var deleteList = [Task]()
+    var progressList = [Task]()
     var tasks : [Task]?
 
     override func viewDidLoad() {
@@ -39,6 +40,34 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         tableView.reloadData()
     }
     
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+
+        let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
+            //DeleteAction.image = UIImage(systemName: "trash")
+            self.deleteList.append(self.tasks![indexPath.row])
+            self.tasks?.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .fade)})
+        
+        let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
+            self.setDays(task: self.tasks![indexPath.row])
+            self.progressList.append(self.tasks![indexPath.row])})
+        
+        return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
+    }
+    
+    func setDays(task: Task) {
+        if task.getDaysConsumed() < task.getDays() {
+            task.setDaysConsumed()
+        }
+        tableView.reloadData()
+    }
     func loadList() {
         
     }
@@ -52,6 +81,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
+                print("DEBUG: Preparing detail segue")
                 let object = tasks?[indexPath.row]
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
@@ -84,7 +114,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tasks", for: indexPath)
         cell.textLabel?.text = tasks![indexPath.row].getTitle()
+        if tasks![indexPath.row].getDaysConsumed() == tasks![indexPath.row].getDays() {
+            cell.detailTextLabel?.text = "Task Completed"
+        } else {
         cell.detailTextLabel?.text = "Progress: " + String(tasks![indexPath.row].getDaysConsumed()) + "/" + String(tasks![indexPath.row].getDays())
+        }
         return cell
     }
 
@@ -93,13 +127,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         return true
     }
 
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            deleteList.append(tasks![indexPath.row])
-            tasks?.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        }
-    }
+//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        if editingStyle == .delete {
+//            deleteList.append(tasks![indexPath.row])
+//            tasks?.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//        }
+//    }
 
 //    func configureCell(_ cell: UITableViewCell, withEvent event: Event) {
 //        cell.textLabel!.text = event.timestamp!.description
