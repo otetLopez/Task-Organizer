@@ -39,12 +39,19 @@ class DetailViewController: UIViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("DEBUG: Total items in list \(tasksList?.count)")
+        for item in tasksList ?? [Task]() {
+            print("\(item.getTitle())")
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        saveCoreData()
         delegate?.setList(taskList: tasksList!)
-        print("Segue assignment \(self.tasksList!.count)")
-        //delegate?.tasks = self.tasksList ?? [Task]()
-         print("Segue assignment \(delegate?.tasks.count)")
+        print("Segue assignment \(delegate?.tasks?.count)")
         
     }
 
@@ -72,31 +79,8 @@ class DetailViewController: UIViewController {
             }
             return ""
         }
-//
-//        func loadData() {
-//            let filePath = getFilePath()
-//            tasksList = [Task]()
-//            if FileManager.default.fileExists(atPath: filePath) {
-//                do {
-//                    // Extract Data
-//                    let fileContents = try String(contentsOfFile: filePath)
-//                    let contentArray = fileContents.components(separatedBy: "\n")
-//                    for content in contentArray {
-//                        let bookContent = content.components(separatedBy: ",")
-//                        if bookContent.count == 4 {
-//                            let newTask = Task(title: task[0].text ?? "New Task", info: task[1].text ?? "", days: Int(task[2].text ?? "0")!)
-//                            tasksList?.append(newTask)
-//                        }
-//                    }
-//
-//                } catch { print(error) }
-//            }
-//        }
+
     @IBAction func addTask(_ sender: UIButton) {
-        let title = task[0].text ?? ""
-        let info = task[1].text ?? ""
-        let days = Int(task[2].text ?? "0") ?? 0
-        
         let newTask = Task(title: task[0].text ?? "New Task", info: task[1].text ?? "", days: Int(task[2].text ?? "0") ?? 0)
         tasksList?.append(newTask)
         
@@ -112,20 +96,21 @@ class DetailViewController: UIViewController {
     func clearTextFields() {
         for textField in task {
             textField.text = ""
-            //textField.resignFirstResponder()
+            textField.resignFirstResponder()
         }
     }
         
 //    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if let TaskTable = segue.destination as? MasterViewController {
+//        if let TaskTable = (segue.destination as! UINavigationController).topViewController as! MasterViewController? {
 //            print("Segue assignment \(self.tasksList!.count)")
-//            TaskTable.tasks = self.tasksList
+//            TaskTable.tasks = self.tasksList ?? [Task]()
 //        }
 //    }
         
         // Accessing Core Data
         
         @objc func saveCoreData() {
+            print("DEBUG: Saving Core Data")
             // call clear core data first
             clearCoreData()
             // create an instance of app delegate
@@ -133,6 +118,7 @@ class DetailViewController: UIViewController {
             // Set the context
             let managedContext = appDelegate.persistentContainer.viewContext
             for item in tasksList! {
+                print("DEBUG: Item \(item.getTitle())")
                 let taskEntity = NSEntityDescription.insertNewObject(forEntityName: "Task_Organizer", into: managedContext)
                 
                 taskEntity.setValue(item.title, forKey: "title")
@@ -147,6 +133,7 @@ class DetailViewController: UIViewController {
         }
         
         func loadCoreData() {
+            print("DEBUG: Loading Data")
              tasksList = [Task]()
             // create an instance of app delegate
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -170,6 +157,7 @@ class DetailViewController: UIViewController {
         }
         
         func clearCoreData() {
+            print("DEBUG: Clearing data")
             // Create an instance of app delegate
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             // Set the context
