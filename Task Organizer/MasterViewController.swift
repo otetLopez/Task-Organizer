@@ -13,9 +13,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
-    var tasks : [Task]?
+    var tasks = [Task]()
 
     override func viewDidLoad() {
+      
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         navigationItem.leftBarButtonItem = editButtonItem
@@ -31,43 +32,39 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
+        
+        print("Total added tasks \(tasks.count)")
+        tableView.reloadData()
     }
 
     @objc
     func insertNewObject(_ sender: Any) {
-//        self.fetchedResultsController.managedObjectContext
-//        let newEvent = Event(context: context)
-//             
-//        // If appropriate, configure the new managed object.
-//        newEvent.timestamp = Date()
-//
-//        // Save the context.
-//        do {
-//            try context.save()
-//        } catch {
-//            // Replace this implementation with code to handle the error appropriately.
-//            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-//            let nserror = error as NSError
-//            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-//        }
     }
 
     // MARK: - Segues
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showDetail" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let object = tasks?[indexPath.row]
-                let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
-                controller.detailItem = object
-                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
-                controller.navigationItem.leftItemsSupplementBackButton = true
-                detailViewController = controller
-            }
-        }
+//        if segue.identifier == "showDetail" {
+//            if let indexPath = tableView.indexPathForSelectedRow {
+//                let object = tasks[indexPath.row]
+//                let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
+//                controller.detailItem = object
+//                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+//                controller.navigationItem.leftItemsSupplementBackButton = true
+//                detailViewController = controller
+//            }
+//        }
+        
+        if let delegate = (segue.destination as! UINavigationController).topViewController as! DetailViewController? {
+                  delegate.delegate = self
+              }
     }
     
 
+    func setList(taskList: [Task]) {
+        print("DEBUG: Setting tasks List")
+        self.tasks = taskList
+    }
     // MARK: - Table View
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -75,13 +72,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tasks?.count ?? 0
+        return tasks.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tasks", for: indexPath)
-        cell.textLabel?.text = tasks![indexPath.row].getTitle()
-        cell.detailTextLabel?.text = "Progress: " + String(tasks![indexPath.row].getDaysConsumed()) + "/" + String(tasks![indexPath.row].getDays())
+        cell.textLabel?.text = tasks[indexPath.row].getTitle()
+        cell.detailTextLabel?.text = "Progress: " + String(tasks[indexPath.row].getDaysConsumed()) + "/" + String(tasks[indexPath.row].getDays())
         return cell
     }
 
@@ -92,7 +89,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            tasks?.remove(at: indexPath.row)
+            tasks.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
