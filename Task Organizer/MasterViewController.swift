@@ -207,8 +207,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                     let info = result.value(forKey: "info") as! String
                     let days = result.value(forKey: "days") as! Int
                     let used = result.value(forKey: "used") as! Int
-                        
-                    tasks?.append(Task(title: title, info: info, days: days, used: used))
+                   // let date = result.value(forKey: "created") as! String
+                        let date = ""
+                    tasks?.append(Task(title: title, info: info, days: days, used: used, date: date))
                 }
             }
         } catch { print(error) }

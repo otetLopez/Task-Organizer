@@ -160,11 +160,23 @@
                                     <action selector="resetFields:" destination="JEX-9P-axG" eventType="touchUpInside" id="4EM-fg-LLo"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ahc-sP-3Pu">
+                                <rect key="frame" x="30" y="88" width="354" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="JzX-MY-4V5"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="ahc-sP-3Pu" firstAttribute="leading" secondItem="VUw-jc-0yf" secondAttribute="leading" constant="30" id="2R9-zK-akL"/>
                             <constraint firstItem="FOK-1I-jGt" firstAttribute="top" secondItem="4gY-A7-5uP" secondAttribute="bottom" constant="20" id="4Nc-pj-MP3"/>
                             <constraint firstItem="RgT-uo-0oO" firstAttribute="leading" secondItem="VUw-jc-0yf" secondAttribute="leading" constant="20" id="G36-nc-38u"/>
+                            <constraint firstItem="ahc-sP-3Pu" firstAttribute="top" secondItem="VUw-jc-0yf" secondAttribute="top" id="JmN-ih-wOA"/>
+                            <constraint firstItem="VUw-jc-0yf" firstAttribute="trailing" secondItem="ahc-sP-3Pu" secondAttribute="trailing" constant="30" id="Lev-yR-Vqn"/>
                             <constraint firstItem="FOK-1I-jGt" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="OtZ-t1-Tkd"/>
                             <constraint firstItem="4gY-A7-5uP" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="d68-KP-IjY"/>
                             <constraint firstItem="RgT-uo-0oO" firstAttribute="top" secondItem="VUw-jc-0yf" secondAttribute="top" constant="50" id="hsZ-Kj-3yy"/>
@@ -176,6 +188,7 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Detail" id="mOI-FS-AaM"/>
                     <connections>
+                        <outlet property="timestampCreated" destination="ahc-sP-3Pu" id="vX2-3F-cIP"/>
                         <outletCollection property="task" destination="KNR-O4-gtw" collectionClass="NSMutableArray" id="9Tu-Rw-kuN"/>
                         <outletCollection property="task" destination="tcx-Ku-d6n" collectionClass="NSMutableArray" id="y9r-YO-W29"/>
                         <outletCollection property="task" destination="bRE-gE-qm7" collectionClass="NSMutableArray" id="vvv-Uu-q0o"/>
@@ -224,7 +237,7 @@
         <image name="plus" catalog="system" width="64" height="56"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Tll-UG-LXB"/>
+        <segue reference="QPG-tW-Grc"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
 </document>

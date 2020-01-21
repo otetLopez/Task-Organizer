@@ -14,20 +14,22 @@ class Task {
     var days : Int
     var used : Int
     
-    //var date : String
+    var date : String
     
-    internal init(title: String, info: String, days: Int) {
+    internal init(title: String, info: String, days: Int, date : String) {
         self.title = title
         self.info = info
         self.days = days
         self.used = 0
+        self.date = date
     }
     
-    internal init(title: String, info: String, days: Int, used: Int) {
+    internal init(title: String, info: String, days: Int, used: Int, date: String) {
         self.title = title
         self.info = info
         self.days = days
         self.used = used
+        self.date = date
     }
     
     func getTitle() -> String {
@@ -46,6 +48,10 @@ class Task {
         return self.info
     }
     
+    func getDateCreated() -> String {
+        return self.date
+    }
+    
     func setTitle(title: String) {
         self.title = title
     }
@@ -61,6 +67,8 @@ class Task {
     func setDaysConsumed() {
         self.used += 1
     }
+    
+
     
     
     

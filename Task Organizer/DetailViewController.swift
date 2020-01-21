@@ -14,8 +14,13 @@ class DetailViewController: UIViewController {
     var tasksList : [Task]?
     weak var delegate: MasterViewController?
     var isModifyingTask : Bool = false
+    @IBOutlet weak var timestampCreated: UILabel!
     @IBOutlet var task: [UITextField]!
     @IBOutlet weak var detailDescriptionLabel: UILabel!
+    
+    // Variables for the date
+    var date : Date = Date()
+    let formatter = DateFormatter()
 
 //    func configureView() {
 //        // Update the user interface for the detail item.
@@ -44,6 +49,7 @@ class DetailViewController: UIViewController {
         if let detail = detailItem {
             print("DEBUG: title is 1 \(detail.getTitle())")
             updateTextFields(updateTask: detail)
+            timestampCreated.text = "Created: " + detail.getDateCreated()
             
             if let label = detailDescriptionLabel {
                 print("DEBUG: title is 2\(detail.getTitle())")
@@ -102,7 +108,8 @@ class DetailViewController: UIViewController {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
         self.view.addGestureRecognizer(tapGesture)
-    
+        
+        formatter.dateFormat = "dd-MM-yy HH:mm"
     }
 
     @objc func viewTapped() {
@@ -133,7 +140,10 @@ class DetailViewController: UIViewController {
             }
         } else {
             if checkFields() {
-                let newTask = Task(title: task[0].text ?? "New Task", info: task[1].text ?? "", days: Int(task[2].text ?? "0") ?? 0)
+                date = Date(timeIntervalSince1970: NSDate().timeIntervalSince1970)
+                let timestamp : String = formatter.string(from: date)
+                print("DEBUG: Added new task at \(timestamp)")
+                let newTask = Task(title: task[0].text ?? "New Task", info: task[1].text ?? "", days: Int(task[2].text ?? "0") ?? 0, date: String(timestamp))
                 tasksList?.append(newTask)
             } else {
                 alertUser(type: "Error", error: "Cannot save task: Complete missing fields")
@@ -197,6 +207,7 @@ class DetailViewController: UIViewController {
             taskEntity.setValue(item.info, forKey: "info")
             taskEntity.setValue(item.days, forKey: "days")
             taskEntity.setValue(item.used, forKey: "used")
+            taskEntity.setValue(item.date, forKey: "created")
                 
             do {
                 try managedContext.save()
@@ -221,8 +232,9 @@ class DetailViewController: UIViewController {
                     let info = result.value(forKey: "info") as! String
                     let days = result.value(forKey: "days") as! Int
                     let used = result.value(forKey: "used") as! Int
+                    let date = result.value(forKey: "created") as! String
                         
-                    tasksList?.append(Task(title: title, info: info, days: days, used: used))
+                    tasksList?.append(Task(title: title, info: info, days: days, used: used, date: date))
                 }
             }
         } catch { print(error) }
