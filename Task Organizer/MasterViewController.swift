@@ -14,8 +14,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     @IBOutlet weak var sortLabel: UILabel!
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
-    var deleteList = [Task]()
-    var progressList = [Task]()
     var tasks : [Task]?
     var sortIndex : Int = 0
     var sortedTasks = [Task]()
@@ -72,34 +70,29 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         if self.resultSearchController.isActive {
                 let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
-                    
                     let deleteTask = self.filteredTableData[indexPath.row]
-                    self.deleteList.append(deleteTask)
                     self.filteredTableData.remove(at: indexPath.row)
-                    //self.tasks?.remove(at: self.getTaskIndex(selectedTask: deleteTask))
                     let index = self.getTaskIndex(selectedTask: deleteTask)
                     print("DEBUG: deleting at index \(self.getTaskIndex(selectedTask: deleteTask))")
                     self.tasks?.remove(at: index)
-                tableView.deleteRows(at: [indexPath], with: .fade)})
+                    self.saveModifications()
+                    tableView.deleteRows(at: [indexPath], with: .fade)})
                     
-                        
                 let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
                     self.setDays(task: self.filteredTableData[indexPath.row])
-                    //self.setDays
-                    self.progressList.append(self.filteredTableData[indexPath.row])})
-                        
+                    self.saveModifications()})
+            
                 return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
             } else {
-            let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
-                    self.deleteList.append(self.tasks![indexPath.row])
+                let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
                     self.tasks?.remove(at: indexPath.row)
-                
+                    self.saveModifications()
                     tableView.deleteRows(at: [indexPath], with: .fade)})
                     
                     let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
                         self.setDays(task: self.tasks![indexPath.row])
-                        self.progressList.append(self.tasks![indexPath.row])})
-                    
+                        self.saveModifications()})
+    
                     return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
         }
         return UISwipeActionsConfiguration(actions: [])
@@ -253,5 +246,48 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             }
         } catch { print(error) }
     }
+    
+    func saveModifications() {
+        print("DEBUG: Saving Modifications")
+            // call clear core data first
+        clearCoreData()
+        // create an instance of app delegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        // Set the context
+        let managedContext = appDelegate.persistentContainer.viewContext
+        for item in tasks! {
+            let taskEntity = NSEntityDescription.insertNewObject(forEntityName: "Task_Organizer", into: managedContext)
+                
+            taskEntity.setValue(item.title, forKey: "title")
+            taskEntity.setValue(item.info, forKey: "info")
+            taskEntity.setValue(item.days, forKey: "days")
+            taskEntity.setValue(item.used, forKey: "used")
+            taskEntity.setValue(item.date, forKey: "created")
+                
+            do {
+                try managedContext.save()
+            } catch { print(error) }
+        }
+    }
+    
+    func clearCoreData() {
+        print("DEBUG: Clearing data")
+        // Create an instance of app delegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        // Set the context
+        let managedContext = appDelegate.persistentContainer.viewContext
+        // Create a fetch request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task_Organizer")
+        fetchRequest.returnsObjectsAsFaults = false
+        do {
+            let results = try managedContext.fetch(fetchRequest)
+            for managedObjects in results {
+                if let managedObjectData = managedObjects as? NSManagedObject {
+                    managedContext.delete(managedObjectData)
+                }
+            }
+        } catch{ print(error)  }
+    }
+    
 }
 

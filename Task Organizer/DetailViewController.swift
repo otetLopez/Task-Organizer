@@ -85,18 +85,6 @@ class DetailViewController: UIViewController {
         // We need the context.  This context is the manager like location manager, audio manager
         let context = appleDelegate.persistentContainer.viewContext
         
-        // Take note of the progress that should be recorded
-        for idx in delegate?.progressList ?? [Task]() {
-            updateData(context: context, updateTask: idx)
-        }
-        delegate?.progressList = [Task]()
-        
-        // Take note of the data that should be deleted
-        for idx in delegate?.deleteList ?? [Task]() {
-            deleteData(context: context, format: idx.getTitle())
-        }
-        delegate?.deleteList = [Task]()
-        
         loadCoreData()
         NotificationCenter.default.addObserver(self, selector: #selector(saveCoreData), name: UIApplication.willResignActiveNotification, object: nil)
         
