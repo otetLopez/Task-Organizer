@@ -72,7 +72,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                     let deleteTask = self.filteredTableData[indexPath.row]
                     self.deleteList.append(deleteTask)
                     self.filteredTableData.remove(at: indexPath.row)
-                    self.tasks?.remove(at: self.getTaskIndex(selectedTask: deleteTask))
+                    //self.tasks?.remove(at: self.getTaskIndex(selectedTask: deleteTask))
+                    let index = self.getTaskIndex(selectedTask: deleteTask)
+                    print("DEBUG: deleting at index \(self.getTaskIndex(selectedTask: deleteTask))")
+                    self.tasks?.remove(at: index)
                 tableView.deleteRows(at: [indexPath], with: .fade)})
                     
                         
