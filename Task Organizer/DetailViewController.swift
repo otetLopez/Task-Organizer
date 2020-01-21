@@ -65,6 +65,7 @@ class DetailViewController: UIViewController {
         super.viewWillDisappear(animated)
         saveCoreData()
         delegate?.setList(taskList: tasksList!)
+        delegate?.tableView.reloadData()
         print("Segue assignment \(delegate?.tasks?.count)")
         
     }
@@ -94,6 +95,7 @@ class DetailViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(saveCoreData), name: UIApplication.willResignActiveNotification, object: nil)
         
         //
+        delegate?.tableView.reloadData()
         if isModifyingTask == true {
             configureView()
         }
@@ -113,10 +115,11 @@ class DetailViewController: UIViewController {
     @IBAction func addTask(_ sender: UIButton) {
         if isModifyingTask == true {
             for idx in tasksList ?? [Task]() {
-                if idx.getTitle() == detailItem?.getTitle() {
+                if idx.getTitle() == detailItem?.getTitle() && idx.getInfo() == detailItem?.getInfo() && idx.getDays() == detailItem?.getDays() {
                     idx.setDays(days: Int(task[2].text ?? String(detailItem!.getDays()))!)
                     idx.setInfo(info: task[1].text ?? detailItem!.getInfo())
                     idx.setTitle(title: task[0].text ?? detailItem!.getTitle())
+                    break
                 }
             }
         } else {
@@ -225,12 +228,16 @@ class DetailViewController: UIViewController {
                 for idx in results as! [NSManagedObject] {
                     // Delete the user or entity
                     if let name = idx.value(forKey: "title") as? String {
-                        print("DEBUG: Deleting with name \(format)")
-                        context.delete(idx)
-                        do {
-                            try context.save()
-                        } catch { print(error) }
-                        print(name)
+                        if let info = idx.value(forKey: "info") as? String {
+                            print("DEBUG: Deleting with name \(format)")
+                            context.delete(idx)
+                            do {
+                                try context.save()
+                            } catch { print(error) }
+                            print(name)
+                            break
+                        }
+                        
                     }
                 }
             }

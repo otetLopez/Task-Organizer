@@ -54,8 +54,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
-        
-        print("Total added tasks \(tasks?.count)")
+        filteredTableData.removeAll()
         tableView.reloadData()
     }
     
@@ -70,9 +69,26 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
         let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
             //DeleteAction.image = UIImage(systemName: "trash")
-            self.deleteList.append(self.tasks![indexPath.row])
-            self.tasks?.remove(at: indexPath.row)
-        tableView.deleteRows(at: [indexPath], with: .fade)})
+//            if self.resultSearchController.isActive {
+//                let deleteTask = self.filteredTableData[indexPath.row]
+//                self.deleteList.append(self.filteredTableData[indexPath.row])
+//                self.filteredTableData.remove(at: indexPath.row)
+//                var index : Int = 0
+//                for idx in self.tasks ?? [Task]() {
+//                    if idx.getTitle() == deleteTask.getTitle() && idx.getInfo() == deleteTask.getInfo() && idx.getDays() == deleteTask.getDays() {
+//                        print("DEBUG: Deleting task at index : \(index) from \(self.tasks?.count)")
+//                        self.tasks?.remove(at: index)
+//                        break
+//                    }
+//                    index += 1
+//                }
+//            } else {
+                self.deleteList.append(self.tasks![indexPath.row])
+                self.tasks?.remove(at: indexPath.row)
+            //}
+                //tableView.reloadData()
+                tableView.deleteRows(at: [indexPath], with: .fade)})
+        //}
         
         let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
             self.setDays(task: self.tasks![indexPath.row])
@@ -100,7 +116,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let object = tasks?[indexPath.row]
+                let object = resultSearchController.isActive ?  filteredTableData[indexPath.row] : tasks?[indexPath.row]
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
