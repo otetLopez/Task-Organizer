@@ -100,17 +100,26 @@ class DetailViewController: UIViewController {
             configureView()
         }
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
+        self.view.addGestureRecognizer(tapGesture)
+    
     }
 
-        func getFilePath() -> String {
-            let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-            if documentPath.count > 0 {
-                let documentDirectory = documentPath[0]
-                let filePath = documentDirectory.appending("/data.txt")
-                return filePath
-            }
-            return ""
+    @objc func viewTapped() {
+        for textfields in task {
+            textfields.resignFirstResponder()
         }
+    }
+    
+    func getFilePath() -> String {
+        let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        if documentPath.count > 0 {
+            let documentDirectory = documentPath[0]
+            let filePath = documentDirectory.appending("/data.txt")
+            return filePath
+        }
+        return ""
+    }
 
     @IBAction func addTask(_ sender: UIButton) {
         if isModifyingTask == true {
@@ -123,12 +132,33 @@ class DetailViewController: UIViewController {
                 }
             }
         } else {
-            let newTask = Task(title: task[0].text ?? "New Task", info: task[1].text ?? "", days: Int(task[2].text ?? "0") ?? 0)
-            tasksList?.append(newTask)
+            if checkFields() {
+                let newTask = Task(title: task[0].text ?? "New Task", info: task[1].text ?? "", days: Int(task[2].text ?? "0") ?? 0)
+                tasksList?.append(newTask)
+            } else {
+                alertUser(type: "Error", error: "Cannot save task: Complete missing fields")
+            }
         }
         print(" Total tasks \(tasksList?.count)")
         delegate?.tableView.reloadData()
         clearTextFields()
+    }
+    
+    func checkFields() -> Bool {
+        for textfield in task {
+            if textfield.text?.isEmpty ?? true { return false }
+        }
+        return true
+    }
+    
+    
+    func alertUser(type: String, error: String) {
+        let alertController = UIAlertController(title: type, message: error, preferredStyle: .alert)
+              
+        let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+              alertController.addAction(okAction)
+        
+        self.present(alertController, animated: true, completion: nil)
     }
     
     @IBAction func resetFields(_ sender: UIButton) {

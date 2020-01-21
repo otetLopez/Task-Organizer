@@ -13,6 +13,7 @@ class Task {
     var info : String
     var days : Int
     var used : Int
+    
     //var date : String
     
     internal init(title: String, info: String, days: Int) {
