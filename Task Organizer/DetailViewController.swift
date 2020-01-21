@@ -152,10 +152,8 @@ class DetailViewController: UIViewController {
     
     func alertUser(type: String, error: String) {
         let alertController = UIAlertController(title: type, message: error, preferredStyle: .alert)
-              
         let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
               alertController.addAction(okAction)
-        
         self.present(alertController, animated: true, completion: nil)
     }
     
@@ -188,7 +186,6 @@ class DetailViewController: UIViewController {
         // Set the context
         let managedContext = appDelegate.persistentContainer.viewContext
         for item in tasksList! {
-            print("DEBUG: Item \(item.getTitle())")
             let taskEntity = NSEntityDescription.insertNewObject(forEntityName: "Task_Organizer", into: managedContext)
                 
             taskEntity.setValue(item.title, forKey: "title")

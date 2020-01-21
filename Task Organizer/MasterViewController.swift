@@ -167,6 +167,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             cell.contentView.backgroundColor = UIColor.lightGray
         } else {
             cell.detailTextLabel?.text = "Progress: " + String(currTask.getDaysConsumed()) + "/" + String(currTask.getDays())
+            cell.contentView.backgroundColor = UIColor.white
         }
         return cell
     }
