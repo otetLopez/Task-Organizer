@@ -66,35 +66,48 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-
-        let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
-            //DeleteAction.image = UIImage(systemName: "trash")
-//            if self.resultSearchController.isActive {
-//                let deleteTask = self.filteredTableData[indexPath.row]
-//                self.deleteList.append(self.filteredTableData[indexPath.row])
-//                self.filteredTableData.remove(at: indexPath.row)
-//                var index : Int = 0
-//                for idx in self.tasks ?? [Task]() {
-//                    if idx.getTitle() == deleteTask.getTitle() && idx.getInfo() == deleteTask.getInfo() && idx.getDays() == deleteTask.getDays() {
-//                        print("DEBUG: Deleting task at index : \(index) from \(self.tasks?.count)")
-//                        self.tasks?.remove(at: index)
-//                        break
-//                    }
-//                    index += 1
-//                }
-//            } else {
-                self.deleteList.append(self.tasks![indexPath.row])
-                self.tasks?.remove(at: indexPath.row)
-            //}
-                //tableView.reloadData()
+        if self.resultSearchController.isActive {
+                let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
+                    
+                    let deleteTask = self.filteredTableData[indexPath.row]
+                    self.deleteList.append(deleteTask)
+                    self.filteredTableData.remove(at: indexPath.row)
+                    self.tasks?.remove(at: self.getTaskIndex(selectedTask: deleteTask))
                 tableView.deleteRows(at: [indexPath], with: .fade)})
-        //}
-        
-        let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
-            self.setDays(task: self.tasks![indexPath.row])
-            self.progressList.append(self.tasks![indexPath.row])})
-        
-        return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
+                    
+                        
+                let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
+                    self.setDays(task: self.filteredTableData[indexPath.row])
+                    //self.setDays
+                    self.progressList.append(self.filteredTableData[indexPath.row])})
+                        
+                return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
+            } else {
+            let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
+                    self.deleteList.append(self.tasks![indexPath.row])
+                    self.tasks?.remove(at: indexPath.row)
+                
+                    tableView.deleteRows(at: [indexPath], with: .fade)})
+                    
+                    let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
+                        self.setDays(task: self.tasks![indexPath.row])
+                        self.progressList.append(self.tasks![indexPath.row])})
+                    
+                    return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
+        }
+        return UISwipeActionsConfiguration(actions: [])
+    }
+    
+    func getTaskIndex(selectedTask : Task) -> Int {
+        var index : Int = 0
+        for idx in self.tasks ?? [Task]() {
+            if idx.getTitle() == selectedTask.getTitle() && idx.getInfo() == selectedTask.getInfo() && idx.getDays() == selectedTask.getDays() {
+                print("DEBUG: Deleting task at index : \(index) from \(self.tasks?.count)")
+                break
+            }
+            index += 1
+        }
+        return index
     }
     
     func setDays(task: Task) {
