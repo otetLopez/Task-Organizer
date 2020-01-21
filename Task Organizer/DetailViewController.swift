@@ -124,6 +124,7 @@ class DetailViewController: UIViewController {
             tasksList?.append(newTask)
         }
         print(" Total tasks \(tasksList?.count)")
+        delegate?.tableView.reloadData()
         clearTextFields()
     }
     

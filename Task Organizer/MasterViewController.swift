@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate {
+class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchResultsUpdating {
 
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
@@ -19,8 +19,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     
     //For the searchbar
     var resultSearchController : UISearchController!
-    var filteredTableData = [String]()
-    var studentNames = [String]()
+    var filteredTableData = [Task]()
 
     override func viewDidLoad() {
       
@@ -36,6 +35,20 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
+        
+        //Set searchbar
+            resultSearchController = ({
+                let controller = UISearchController(searchResultsController: nil)
+                controller.searchResultsUpdater = self
+                controller.definesPresentationContext = true
+                controller.searchBar.placeholder = "Search task"
+                controller.obscuresBackgroundDuringPresentation = false
+                controller.searchBar.sizeToFit()
+                controller.searchBar.autocapitalizationType = .none
+                return controller
+                })()
+
+                navigationItem.searchController = resultSearchController
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -113,17 +126,18 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tasks?.count ?? 0
+        return (resultSearchController.isActive) ? filteredTableData.count : tasks?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tasks", for: indexPath)
-        cell.textLabel?.text = tasks![indexPath.row].getTitle()
-        if tasks![indexPath.row].getDaysConsumed() == tasks![indexPath.row].getDays() {
+        let currTask = resultSearchController.isActive ? filteredTableData[indexPath.row] : tasks![indexPath.row]
+        cell.textLabel?.text = currTask.getTitle()
+        if currTask.getDaysConsumed() == currTask.getDays() {
             cell.detailTextLabel?.text = "Task Completed"
             cell.contentView.backgroundColor = UIColor.lightGray
         } else {
-            cell.detailTextLabel?.text = "Progress: " + String(tasks![indexPath.row].getDaysConsumed()) + "/" + String(tasks![indexPath.row].getDays())
+            cell.detailTextLabel?.text = "Progress: " + String(currTask.getDaysConsumed()) + "/" + String(currTask.getDays())
         }
         return cell
     }
@@ -131,6 +145,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        filteredTableData.removeAll(keepingCapacity: false)
+        for idx in tasks ?? [Task]() {
+            if idx.getTitle().localizedCaseInsensitiveContains(searchController.searchBar.text!) || idx.getInfo().localizedCaseInsensitiveContains(searchController.searchBar.text!) {
+                filteredTableData.append(idx)
+            }
+        }
+
+        self.tableView.reloadData()
     }
 
 //    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
