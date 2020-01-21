@@ -41,8 +41,28 @@ class Task {
         return self.used
     }
     
+    func getInfo() -> String {
+        return self.info
+    }
+    
+    func setTitle(title: String) {
+        self.title = title
+    }
+    
+    func setInfo(info: String) {
+        self.info = info
+    }
+    
+    func setDays(days: Int) {
+        self.days = days
+    }
+    
     func setDaysConsumed() {
         self.used += 1
     }
+    
+    
+    
+    
     
 }

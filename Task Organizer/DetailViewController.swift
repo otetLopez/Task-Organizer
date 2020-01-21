@@ -143,7 +143,7 @@ class DetailViewController: UIViewController {
         task[0].text = updateTask.getTitle()
         task[1].text = updateTask.getInfo()
         task[2].text = String(updateTask.getDays())
-        } else { print("dEBUG : Fields are nil") }
+        } else { print("DEBUG : Fields are nil") }
     }
         
     // Accessing Core Data

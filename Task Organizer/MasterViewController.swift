@@ -16,12 +16,18 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     var deleteList = [Task]()
     var progressList = [Task]()
     var tasks : [Task]?
+    
+    //For the searchbar
+    var resultSearchController : UISearchController!
+    var filteredTableData = [String]()
+    var studentNames = [String]()
 
     override func viewDidLoad() {
       
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         navigationItem.leftBarButtonItem = editButtonItem
+        tableView.allowsSelection = true
         loadList()
 
 //        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
@@ -81,7 +87,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                print("DEBUG: Preparing detail segue")
                 let object = tasks?[indexPath.row]
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
@@ -116,8 +121,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         cell.textLabel?.text = tasks![indexPath.row].getTitle()
         if tasks![indexPath.row].getDaysConsumed() == tasks![indexPath.row].getDays() {
             cell.detailTextLabel?.text = "Task Completed"
+            cell.contentView.backgroundColor = UIColor.lightGray
         } else {
-        cell.detailTextLabel?.text = "Progress: " + String(tasks![indexPath.row].getDaysConsumed()) + "/" + String(tasks![indexPath.row].getDays())
+            cell.detailTextLabel?.text = "Progress: " + String(tasks![indexPath.row].getDaysConsumed()) + "/" + String(tasks![indexPath.row].getDays())
         }
         return cell
     }
