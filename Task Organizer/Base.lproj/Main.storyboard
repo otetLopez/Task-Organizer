@@ -32,9 +32,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <label key="tableHeaderView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pw5-PA-CEL">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                            <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="tasks" textLabel="55J-c6-I6K" detailTextLabel="CGe-Rg-1Yf" style="IBUITableViewCellStyleSubtitle" id="Y3b-Rr-LNV">
-                                <rect key="frame" x="0.0" y="28" width="414" height="55.5"/>
+                                <rect key="frame" x="0.0" y="72" width="414" height="55.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Y3b-Rr-LNV" id="ub1-3s-1hD">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="55.5"/>
@@ -67,12 +74,20 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Tasks" id="PVz-lE-NP2">
+                        <barButtonItem key="leftBarButtonItem" image="arrow.up.arrow.down.square" catalog="system" id="iLC-wN-6VM">
+                            <connections>
+                                <action selector="sortButtonPressed:" destination="0dt-TT-N2h" id="DjX-P7-d3G"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="xcX-r4-Qhu">
                             <connections>
                                 <segue destination="vC3-pB-5Vb" kind="showDetail" id="r8w-Q2-CJB"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="sortLabel" destination="pw5-PA-CEL" id="LBX-9e-JY5"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rSK-Tk-Csa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -234,6 +249,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="arrow.up.arrow.down.square" catalog="system" width="64" height="56"/>
         <image name="plus" catalog="system" width="64" height="56"/>
     </resources>
     <inferredMetricsTieBreakers>

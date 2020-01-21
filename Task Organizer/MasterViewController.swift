@@ -11,11 +11,14 @@ import CoreData
 
 class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchResultsUpdating {
 
+    @IBOutlet weak var sortLabel: UILabel!
     var detailViewController: DetailViewController? = nil
     var managedObjectContext: NSManagedObjectContext? = nil
     var deleteList = [Task]()
     var progressList = [Task]()
     var tasks : [Task]?
+    var sortIndex : Int = 0
+    var sortedTasks = [Task]()
     
     //For the searchbar
     var resultSearchController : UISearchController!
@@ -25,7 +28,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
       
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        navigationItem.leftBarButtonItem = editButtonItem
+        //navigationItem.leftBarButtonItem = editButtonItem
         tableView.allowsSelection = true
         load_init()
 
@@ -54,6 +57,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
+        sortLabel.text = ""
         filteredTableData.removeAll()
         tableView.reloadData()
     }
@@ -190,6 +194,41 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         self.tableView.reloadData()
     }
     
+    @IBAction func sortButtonPressed(_ sender: UIBarButtonItem) {
+        sortIndex += 1
+        print("DEBUG: Sorting by \(sortIndex)")
+        if tasks?.count ?? 0 > 0 {
+            switch(sortIndex) {
+            case 1:
+                // Sort By Name
+                sortedTasks = tasks!.sorted { $0.title < $1.title }
+                tasks = sortedTasks
+                sortLabel.text = "Sorted By Name △"
+            case 2:
+                // Sort By Date
+                // This will use the existing array tasks[]
+                // But will just divide the section
+                sortedTasks = tasks!.sorted { $0.title > $1.title }
+                tasks = sortedTasks
+                sortLabel.text = "Sorted By Name ▽"
+            case 3:
+                sortedTasks = tasks!.sorted { $0.date < $1.date }
+                tasks = sortedTasks
+                sortLabel.text = "Sorted By Date Created △"
+            case 4:
+                sortedTasks = tasks!.sorted { $0.date > $1.date }
+                tasks = sortedTasks
+                sortIndex = 0
+                sortLabel.text = "Sorted By Date Created ▽"
+            default:
+                sortIndex = 0
+                sortedTasks = tasks ?? [Task]()
+                break
+            }
+            tableView.reloadData()
+        }
+    }
+    
     func load_init() {
         print("DEBUG: Loading Initial Data")
         tasks = [Task]()
@@ -207,105 +246,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                     let info = result.value(forKey: "info") as! String
                     let days = result.value(forKey: "days") as! Int
                     let used = result.value(forKey: "used") as! Int
-                   // let date = result.value(forKey: "created") as! String
-                        let date = ""
+                    let date = result.value(forKey: "created") as! String
+                    
                     tasks?.append(Task(title: title, info: info, days: days, used: used, date: date))
                 }
             }
         } catch { print(error) }
     }
-
-//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//            deleteList.append(tasks![indexPath.row])
-//            tasks?.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-//        }
-//    }
-
-//    func configureCell(_ cell: UITableViewCell, withEvent event: Event) {
-//        cell.textLabel!.text = event.timestamp!.description
-//    }
-//
-//    // MARK: - Fetched results controller
-//
-//    var fetchedResultsController: NSFetchedResultsController<Event> {
-//        if _fetchedResultsController != nil {
-//            return _fetchedResultsController!
-//        }
-//
-//        let fetchRequest: NSFetchRequest<Event> = Event.fetchRequest()
-//
-//        // Set the batch size to a suitable number.
-//        fetchRequest.fetchBatchSize = 20
-//
-//        // Edit the sort key as appropriate.
-//        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
-//
-//        fetchRequest.sortDescriptors = [sortDescriptor]
-//
-//        // Edit the section name key path and cache name if appropriate.
-//        // nil for section name key path means "no sections".
-//        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: nil, cacheName: "Master")
-//        aFetchedResultsController.delegate = self
-//        _fetchedResultsController = aFetchedResultsController
-//
-//        do {
-//            try _fetchedResultsController!.performFetch()
-//        } catch {
-//             // Replace this implementation with code to handle the error appropriately.
-//             // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-//             let nserror = error as NSError
-//             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-//        }
-//
-//        return _fetchedResultsController!
-//    }
-//    var _fetchedResultsController: NSFetchedResultsController<Event>? = nil
-//
-//    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        tableView.beginUpdates()
-//    }
-//
-//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-//        switch type {
-//            case .insert:
-//                tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
-//            case .delete:
-//                tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
-//            default:
-//                return
-//        }
-//    }
-//
-//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-//        switch type {
-//            case .insert:
-//                tableView.insertRows(at: [newIndexPath!], with: .fade)
-//            case .delete:
-//                tableView.deleteRows(at: [indexPath!], with: .fade)
-//            case .update:
-//                configureCell(tableView.cellForRow(at: indexPath!)!, withEvent: anObject as! Event)
-//            case .move:
-//                configureCell(tableView.cellForRow(at: indexPath!)!, withEvent: anObject as! Event)
-//                tableView.moveRow(at: indexPath!, to: newIndexPath!)
-//            default:
-//                return
-//        }
-//    }
-//
-//    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        tableView.endUpdates()
-//    }
-
-    /*
-     // Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
-     
-     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-         // In the simplest, most efficient, case, reload the table view.
-         tableView.reloadData()
-     }
-     */
-
 }
 

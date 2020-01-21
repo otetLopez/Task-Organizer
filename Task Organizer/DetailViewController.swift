@@ -109,7 +109,7 @@ class DetailViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
         self.view.addGestureRecognizer(tapGesture)
         
-        formatter.dateFormat = "dd-MM-yy HH:mm"
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
     }
 
     @objc func viewTapped() {
