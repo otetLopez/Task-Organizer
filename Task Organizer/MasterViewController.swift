@@ -27,7 +27,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // Do any additional setup after loading the view.
         navigationItem.leftBarButtonItem = editButtonItem
         tableView.allowsSelection = true
-        loadList()
+        load_init()
 
 //        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
 //        navigationItem.rightBarButtonItem = addButton
@@ -172,6 +172,30 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
 
         self.tableView.reloadData()
+    }
+    
+    func load_init() {
+        print("DEBUG: Loading Initial Data")
+        tasks = [Task]()
+        // create an instance of app delegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        // Set the context
+        let managedContext = appDelegate.persistentContainer.viewContext
+
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task_Organizer")
+        do {
+            let results = try managedContext.fetch(fetchRequest) // Can cast this into as [NSManagedObject] or
+            if results is [NSManagedObject] {
+                for result in results as! [NSManagedObject] {
+                    let title = result.value(forKey: "title") as! String
+                    let info = result.value(forKey: "info") as! String
+                    let days = result.value(forKey: "days") as! Int
+                    let used = result.value(forKey: "used") as! Int
+                        
+                    tasks?.append(Task(title: title, info: info, days: days, used: used))
+                }
+            }
+        } catch { print(error) }
     }
 
 //    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
