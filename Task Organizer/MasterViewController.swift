@@ -76,6 +76,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                     print("DEBUG: deleting at index \(self.getTaskIndex(selectedTask: deleteTask))")
                     self.tasks?.remove(at: index)
                     self.saveModifications()
+                    self.deleteData(format: deleteTask.getTitle())
                     tableView.deleteRows(at: [indexPath], with: .fade)})
                     
                 let AddDayAction = UIContextualAction(style: .normal, title: "Add day", handler: { (action, view, success) in
@@ -85,6 +86,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                 return UISwipeActionsConfiguration(actions: [DeleteAction, AddDayAction])
             } else {
                 let DeleteAction = UIContextualAction(style: .destructive, title: "Delete", handler: { (action, view, success) in
+                    self.deleteData(format: (self.tasks?[indexPath.row].getTitle())!)
                     self.tasks?.remove(at: indexPath.row)
                     self.saveModifications()
                     tableView.deleteRows(at: [indexPath], with: .fade)})
@@ -288,6 +290,35 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                 }
             }
         } catch{ print(error)  }
+    }
+    
+    func deleteData(format : String) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task_Organizer")
+        // Helps filter the query
+        deleteRequest.predicate = NSPredicate(format: "title=%@", format)
+        deleteRequest.returnsObjectsAsFaults = false
+        do {
+            let results = try context.fetch(deleteRequest)
+            if results.count > 0 {
+                for idx in results as! [NSManagedObject] {
+                    // Delete the user or entity
+                    if let name = idx.value(forKey: "title") as? String {
+                        if let info = idx.value(forKey: "info") as? String {
+                            print("DEBUG: Deleting with name \(format)")
+                            context.delete(idx)
+                            do {
+                                try context.save()
+                            } catch { print(error) }
+                            print(name)
+                            break
+                        }
+                        
+                    }
+                }
+            }
+        } catch { print(error) }
     }
     
 }
